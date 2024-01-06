@@ -1,0 +1,177 @@
+node_conf {
+  node_number(1:2) =  2, 2,           ! Use 2 x 2 parallel nodes
+  if_periodic(1:2) = .false., .true.,  ! Periodic boundaries in both x and y
+  n_threads = 1,                      ! Use 1 threads per node
+}
+
+grid { 
+  nx_p(1:2) = 256, 256,               ! Use a 256 x 256 grid
+}
+
+time_step {
+  dt     =   0.01,                    ! \Delta t = 0.07
+  ndump  =  20,                        ! Global diagnostic frequency set to 5
+}
+
+space {
+  xmin(1:2) =   0 , 0,        ! Simulation box will range from -12.8 to 12.8
+  xmax(1:2) =    37.69908 ,  37.69908,        ! in both dimensions
+}
+
+time {
+  tmax  = 60.0,                       ! Run simulation up to t = 30
+}
+
+emf_bound {
+type(1:2,1)= "lindmann", "lindmann",
+!type(1:2,2)= "open", "open",
+}
+
+diag_emf {
+  ndump_fac = 2,                     					! diagnostics at every 10 * 5 = 50 timesteps
+  reports = "b1", "b2", "b3", "e1", "e2", "e3",        ! save all magnetic field components
+}
+
+particles {
+  	num_species = 2,                    ! Use 2 particle species
+	interpolation = "cubic",
+}
+
+!! ELECTRONS FIRST !!
+
+species {
+  	name = "electrons" ,                ! Name used for diagnostics
+  	num_par_x(1:2) = 8, 8,              ! 8 x 8 particles per cell
+	num_par_max = 500000,
+  	rqm=-1.0,                           ! m/q = -1 (electrons)
+	!q_real = 1.0,
+}
+
+udist {
+  uth(1:3) =  0.01 , 0.01 , 0.01 ,       ! Initial thermal velocity
+  ufl(1:3) =  0.0 , 0.0 , 0.0 ,       ! Initial fluid velocity (0.6 c along z)
+}
+
+profile
+{
+	num_x = 6,
+	fx(1:6,1) =  0,    0,   1, 1, 0,   0,
+	x(1:6,1) = 0.0, 12.55636, 12.57636, 25.12272, 25.14272, 37.69908,
+	fx(1:6,2) =  1,    1, 1, 1,   1,   1,
+	x(1:6,2) = 0.0, 12.55636, 12.57636, 25.12272, 25.14272, 37.69908,
+}
+
+spe_bound 
+{
+  	type(1:2,1) = "open", "open",
+	type(1:2,2) = "open", "open",
+!	uth_bnd(1:3,1,2) = 0.1, 0.1, 0.1,
+!	ufl_bnd(1:3,2,2) = 0.001, 0.001,0.001,
+}
+
+diag_species
+{
+	  ndump_fac_pha = 2,
+	  ndump_fac_raw = 0,
+	  ps_xmin(1:2) =   0.0 , 0.000d0 ,
+	  ps_xmax(1:2) =  37.69908, 37.69908, 
+	  ps_pmin(1:3) = -1.0 , -1.0, -1.0,
+	  ps_pmax(1:3) = 1.0, 1.0, 1.0,
+	  ps_nx(1:2)   =  256,  256,  ps_np(1:3)   =  100,  100,  100,
+	  if_ps_p_auto(1:3) = .true., .true., .true.,
+	  phasespaces = "x2x1", "x2x1_m", "p1x1", "p1p3", "p1p2", "x1p1p2" ,"x2x1_q1",
+	  ps_gammamin = 1.0, ps_gammamax = 2000.0,   ps_ngamma = 1024,
+	  if_ps_gamma_auto = .true.,
+	  raw_gamma_limit=1.2,
+	  raw_fraction = 0.1,
+	  n_ene_bins=6,
+	  ene_bins(1:6)=0.005,0.04,0.08,0.12,0.2,0.5,
+	  pha_ene_bin='x2x1_q1'
+}
+
+!! NOW IONS !!
+
+species {
+  	name = "ions" ,                ! Name used for diagnostics
+  	num_par_x(1:2) = 8, 8,              ! 8 x 8 particles per cell
+	num_par_max = 500000,
+  	rqm=3672.0,                           ! m/q = 2*1836 (proton+neutron)
+}
+
+udist {
+  uth(1:3) =  0.01 , 0.01 , 0.01 ,       ! Initial thermal velocity
+  ufl(1:3) =  0.0 , 0.0 , 0.0 ,       ! Initial fluid velocity (0.6 c along z)
+}
+
+profile
+{
+	num_x = 6,
+	fx(1:6,1) =  0,    0,   1, 1, 0,   0,
+	x(1:6,1) = 0.0, 12.55636, 12.57636, 25.12272, 25.14272, 37.69908,
+	fx(1:6,2) =  1,    1, 1, 1,   1,   1,
+	x(1:6,2) = 0.0, 12.55636, 12.57636, 25.12272, 25.14272, 37.69908,
+}
+
+spe_bound 
+{
+  	type(1:2,1) = "open", "open",
+	type(1:2,2) = "open", "open",
+!	uth_bnd(1:3,1,2) = 0.1, 0.1, 0.1,
+!	ufl_bnd(1:3,2,2) = 0.001, 0.001,0.001,
+}
+
+diag_species
+{
+	  ndump_fac_pha = 2,
+	  ndump_fac_raw = 0,
+	  ps_xmin(1:2) =   0.0 , 0.000d0 ,
+	  ps_xmax(1:2) =  37.69908, 37.69908, 
+	  ps_pmin(1:3) = -1.0 , -1.0, -1.0,
+	  ps_pmax(1:3) = 1.0, 1.0, 1.0,
+	  ps_nx(1:2)   =  256,  256,  ps_np(1:3)   =  100,  100,  100,
+	  if_ps_p_auto(1:3) = .true., .true., .true.,
+	  phasespaces = "x2x1", "x2x1_m", "p1x1", "p1p3", "p1p2", "x1p1p2" ,"x2x1_q1",
+	  ps_gammamin = 1.0, ps_gammamax = 2000.0,   ps_ngamma = 1024,
+	  if_ps_gamma_auto = .true.,
+	  raw_gamma_limit=1.2,
+	  raw_fraction = 0.1,
+	  n_ene_bins=6,
+	  ene_bins(1:6)=0.005,0.04,0.08,0.12,0.2,0.5,
+	  pha_ene_bin='x2x1_q1'
+}
+
+
+
+
+zpulse_wall {
+  a0             = 0.01,
+  omega0         = 2.0,
+  propagation    = "backward",
+
+  pol            = 90.0d0,
+
+  per_type       = "gaussian",
+  per_w0         = 20.0,
+  per_focus      = 20.0,
+
+  tenv_type       = "sin2",
+  tenv_rise       = 5.0,
+  tenv_fall       = 0.0,
+  tenv_flat       = 55.0,
+
+  launch_time     = 0.0,
+
+	if_launch = .true.
+}
+
+current{}
+
+diag_current {
+  ndump_fac = 2,                       ! diagnostics at every 10 * 2 = 20 timesteps
+  reports = "j3",                       ! save z component of current density
+}
+
+
+
+
+

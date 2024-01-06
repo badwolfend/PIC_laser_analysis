@@ -1,0 +1,7 @@
+
+Lasers/.DS_Store
+.DS_Store
+Lasers/Analysis/Bluehive/__pycache__/analysis.cpython-311.pyc
+Lasers/Analysis/Bluehive/__pycache__/h5_utilities.cpython-311.pyc
+Lasers/Analysis/Bluehive/__pycache__/str2keywords.cpython-311.pyc
+*.h5
