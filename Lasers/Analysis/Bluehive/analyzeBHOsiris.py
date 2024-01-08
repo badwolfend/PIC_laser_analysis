@@ -4,17 +4,62 @@ import numpy as np
 import os
 from analysis import *
 from matplotlib.animation import PillowWriter, FuncAnimation
-import moviepy.editor as mpya
+import moviepy.editor as mpy
+import re
 
-def generate_plot(frame_number, ax):
+def extract_number(filename):
+    """
+    Extracts the last number found in a filename using regular expression.
+    If no number is found, returns None.
+    """
+    matches = re.findall(r'\d+', filename)
+    return int(matches[-1]) if matches else None
+
+def order_files_by_number(directory, dataset='e1'):
+    """
+    Orders files in the given directory based on the last number in their filenames.
+    """
+    odir = os.path.join(directory, 'MS', 'FLD', dataset)
+
+    files = [file.split('.h5')[0] for file in os.listdir(odir) if file.endswith('.h5')]
+
+    files_with_numbers = [(file, extract_number(file)) for file in files]
+    # Filter out files where no number was found
+    files_with_numbers = [fn for fn in files_with_numbers if fn[1] is not None]
+    
+    #find 
+    # Sort files by the extracted number
+    sorted_files = sorted(files_with_numbers, key=lambda x: x[1])
+    return [odir+"/"+fn[0]+".h5" for fn in sorted_files]
+
+def generate_plot(frame_number, flist, ax):
     """
     Function to generate each plot. You can modify this function to create different plots.
     """
     ax.clear()
+    fhere = h5py.File(flist[frame_number], 'r')
 
-    ax.plot(x, y)
+    if(len(fhere['AXIS']) == 2):
 
-def create_movie(filename, num_frames=100, fps=10):
+        xaxismin = fhere['AXIS']['AXIS1'][0]
+        xaxismax = fhere['AXIS']['AXIS1'][1]
+        yaxismin = fhere['AXIS']['AXIS2'][0]
+        yaxismax = fhere['AXIS']['AXIS2'][1]
+
+        plt.imshow(fhere[dataset][:,:]+1e-12,
+            aspect='auto',
+            extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap="RdBu", vmin=-0.1, vmax=0.1)
+        
+        try:
+            fdens = flist[frame_number].split("MS")[0]+"MS/PHA/x2x1/electrons/x2x1-electrons-"+flist[frame_number].split(".h5")[0].split("-")[-1]+".h5"
+            fheredens = h5py.File(fdens, "r")
+            plt.imshow(fheredens["x2x1"][:,:]+1e-12,
+            extent=[xaxismin, xaxismax, yaxismin, yaxismax], alpha=0.2, cmap="grey")
+        except:
+            print("No density data!")
+            # plt.colorbar(orientation='vertical')
+
+def create_movie(filename, num_frames=100, fps=10, flist=[]):
     """
     Function to create a movie from a sequence of plots.
     """
@@ -22,7 +67,7 @@ def create_movie(filename, num_frames=100, fps=10):
     fig, ax = plt.subplots()
 
     # Creating an animation by updating the plot for each frame
-    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(ax,))
+    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(flist, ax,))
 
     # Save the animation as a GIF (you can also save it as mp4 or other formats)
     writer = PillowWriter(fps=fps)
@@ -188,18 +233,29 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
     if to_plot:
         plt.show()
 
-dirname = '/Users/james/Desktop/Folders/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/Laser2D'
-dirname = '/Users/james/Desktop/Folders/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/Laser2D_n_ncrit'
-dirname = '/Users/james/Desktop/Folders/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/Laser2D_n_ncrit_laserunits'
-dirname = '/Users/james/Desktop/Folders/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/Laser2D_n_ncrit_lu_pulse'
+
+datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
+datadir = os.getcwd()+"/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/"
+
+dirname = datadir+'Laser2D'
+dirname = datadir+'Laser2D_n_ncrit'
+dirname = datadir+'Laser2D_n_ncrit_laserunits'
+dirname = datadir+'Laser2D_n_ncrit_lu_pulse'
+
+dataset = 'e3'
+
+# Example usage
+directory_path = dirname 
+sorted_files = order_files_by_number(directory=dirname, dataset=dataset)
+# print(sorted_files)
 
 ncrit_m3 = find_critical_dens(0.532)
 ncrit_cm3 = ncrit_m3*(1e-6)
 print("ncrit = ", ncrit_cm3/(4*3.14159**2), "cm^-3")
 print("ncrit = ", ncrit_m3, "m^-3")
 
-phasespace(rundir=dirname,dataset='x2x1',time=5, xlim=[0,12], species='electrons', to_plot=False)
-field(rundir=dirname,dataset='e3',time=5,xlim=[0,12], color='RdBu')
+# phasespace(rundir=dirname,dataset='x2x1',time=5, xlim=[0,12], species='electrons', to_plot=False)
+# field(rundir=dirname,dataset='e3',time=4.02,xlim=[0,12], color='RdBu')
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
-
+create_movie(filename="e3-test.gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
