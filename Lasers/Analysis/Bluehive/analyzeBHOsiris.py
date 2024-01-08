@@ -32,7 +32,7 @@ def order_files_by_number(directory, dataset='e1'):
     sorted_files = sorted(files_with_numbers, key=lambda x: x[1])
     return [odir+"/"+fn[0]+".h5" for fn in sorted_files]
 
-def generate_plot(frame_number, flist, ax):
+def generate_plot(frame_number, flist, is1d, ax):
     """
     Function to generate each plot. You can modify this function to create different plots.
     """
@@ -45,29 +45,55 @@ def generate_plot(frame_number, flist, ax):
         xaxismax = fhere['AXIS']['AXIS1'][1]
         yaxismin = fhere['AXIS']['AXIS2'][0]
         yaxismax = fhere['AXIS']['AXIS2'][1]
+        if is1d:
+            num_points = fhere[dataset].shape[1]
+            x = np.linspace(start=xaxismin, stop=xaxismax, num=num_points)
+            y = np.mean(fhere[dataset], axis=0)
+            ax.plot(x, y, "r")
+            ylimabs = 0.06
+            ylim(-ylimabs, ylimabs)
 
-        plt.imshow(fhere[dataset][:,:]+1e-12,
-            aspect='auto',
-            extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap="RdBu", vmin=-0.1, vmax=0.1)
-        
-        try:
-            fdens = flist[frame_number].split("MS")[0]+"MS/PHA/x2x1/electrons/x2x1-electrons-"+flist[frame_number].split(".h5")[0].split("-")[-1]+".h5"
-            fheredens = h5py.File(fdens, "r")
-            plt.imshow(fheredens["x2x1"][:,:]+1e-12,
-            extent=[xaxismin, xaxismax, yaxismin, yaxismax], alpha=0.2, cmap="grey")
-        except:
-            print("No density data!")
-            # plt.colorbar(orientation='vertical')
+            try:
+                fdens = flist[frame_number].split("MS")[0]+"MS/PHA/x2x1/electrons/x2x1-electrons-"+flist[frame_number].split(".h5")[0].split("-")[-1]+".h5"
+                fheredens = h5py.File(fdens, "r")
+                y = np.mean(fheredens["x2x1"], axis=0)
+                maxy = np.max(np.abs(y))
+                y = y*ylimabs/(1.02*maxy)
+                ax.plot(x,y)
+            except:
+                print("No density data!")
+                
+        else:
+            plt.imshow(fhere[dataset][:,:]+1e-12,
+                aspect='auto',
+                extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap="RdBu", vmin=-0.1, vmax=0.1)
+            
+            try:
+                fdens = flist[frame_number].split("MS")[0]+"MS/PHA/x2x1/electrons/x2x1-electrons-"+flist[frame_number].split(".h5")[0].split("-")[-1]+".h5"
+                fheredens = h5py.File(fdens, "r")
+                plt.imshow(fheredens["x2x1"][:,:]+1e-12,
+                extent=[xaxismin, xaxismax, yaxismin, yaxismax], alpha=0.2, cmap="grey")
+            except:
+                print("No density data!")
+                # plt.colorbar(orientation='vertical')
 
 def create_movie(filename, num_frames=100, fps=10, flist=[]):
     """
     Function to create a movie from a sequence of plots.
     """
+    # Ensure save directory exists #
+    mkdir = flist[0].split("MS")[0]+"Outputs/"
+    filename = mkdir+filename
+    try:
+        os.mkdir(mkdir)
+    except:
+        print("Cannot make directory to output plots and videos.")
+
     # Create a figure and axis for the plot
     fig, ax = plt.subplots()
 
     # Creating an animation by updating the plot for each frame
-    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(flist, ax,))
+    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(flist, True, ax,))
 
     # Save the animation as a GIF (you can also save it as mp4 or other formats)
     writer = PillowWriter(fps=fps)
@@ -258,4 +284,4 @@ print("ncrit = ", ncrit_m3, "m^-3")
 # field(rundir=dirname,dataset='e3',time=4.02,xlim=[0,12], color='RdBu')
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
-create_movie(filename="e3-test.gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
+create_movie(filename=dataset+"-test.gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
