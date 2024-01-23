@@ -231,7 +231,7 @@ def find_critical_dens(wl):
     return n_crit
 
 def field(rundir='',dataset='e1',time=0,space=-1,
-    xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
+    xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,intensitymult=1,
     plotdata=[], color=None, to_plot=True, **kwargs):
 
     workdir = os.getcwd()
@@ -275,11 +275,14 @@ def field(rundir='',dataset='e1',time=0,space=-1,
         yaxismax = ymult*fhere['AXIS']['AXIS2'][1]
 
         if color != None:
-            plt.imshow(fhere[dataset][:,:]+1e-12,
+            plt.imshow(intensitymult*fhere[dataset][:,:]+1e-12,
                        aspect='auto',
-                       extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=color, vmin=-0.006, vmax=0.006)
+                       extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=color)
+            # plt.imshow(intensitymult*fhere[dataset][:,:]+1e-12,
+            #         aspect='auto',
+            #         extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=color, vmin=-0.006, vmax=0.006)           
         else:
-            plt.imshow(fhere[dataset][:,:]+1e-12,
+            plt.imshow(intensitymult*fhere[dataset][:,:]+1e-12,
                     aspect='auto',
                     extent=[xaxismin, xaxismax, yaxismin, yaxismax])
         plt.colorbar(orientation='vertical')
@@ -417,8 +420,11 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     elc = 1.602177e-19
     clight = 3e8
     temp = clight**2*m_e*((pfit[2])**2)/(elc) # in eV
-    print("Temperature: ")
-    print(temp)
+    print("Temperature: "+str(temp)+" eV")
+
+    # Now also plot the 1 eV Maxwellian
+    maxwellian = gaussian(yaxis, pfit[0], pfit[1], np.sqrt(elc/(m_e*1*clight**2)))
+    ax2.plot(maxwellian, yaxis, color='black', linestyle='--')
     ax2.plot(line_out_values, yaxis, color='blue')
     ax2.plot(y_fit, yaxis, color='red')
     ax2.set_title("1D Line-out at x={}".format(line_out_x))
@@ -496,16 +502,33 @@ dirname = datadir+'Laser2D_n_ncrit_0p5'
 dataset = 'e3'
 
 # Define laser and plasma parameters #
+m_e = 9.109383e-31
+elc = 1.602177e-19
+eps0 = 8.854188e-12
 clight = 3e8 # m/s
-wavelength = 532e-9 # m
+wavelength = 527e-9 # m
 n_over_ncrit = 0.5
 omega_L = 2*np.pi*clight/wavelength # rad/s    
 omega_p = omega_L*np.sqrt(n_over_ncrit) # rad/s
 
+# Compute electric field amplitude to convert from unitless to units #
+amp = (elc*clight/(omega_p))/(m_e*clight**2)
+Eamp = 1/amp
+one_over_conv = (elc*clight)/(m_e*clight**2)
+conv = (1/one_over_conv)*1e-9*1e-2 # Convert from 1/m to 1/cm
+print("Conversion factor: "+str(conv))
+# Compute the electric field given intensity and wavelength #
+S = 3.5e16 # W/m^2
+Emax = np.sqrt(2*S/(eps0*clight))
+a0 = Emax*(elc*wavelength/(2*np.pi*m_e*clight**2))
+print(a0)
+# Print value in scientific notation #
+print("Emax: "+f"{Emax:.2e}")
+
 # Define geometry specific to the run deck #
 n_wavelengths = 12 # How many wavelengths to span in the x1 direction
 xsim = (n_wavelengths*wavelength)*omega_p/clight # Length of simulation in x1 direction unitless
-print(xsim)
+
 # Example usage
 directory_path = dirname 
 sorted_files = order_files_by_number(directory=dirname, dataset=dataset)
@@ -514,13 +537,14 @@ sorted_files = order_files_by_number(directory=dirname, dataset=dataset)
 ncrit_m3 = find_critical_dens(0.532)
 ncrit_cm3 = ncrit_m3*(1e-6)
 
-time = 120
-make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
+time = 150
+# make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
+make_contour2(rundir=dirname,dataset='p3x2',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 phasespace(rundir=dirname,dataset='x2x1_ene',time=time, xlim=[0,12], xmult=clight/omega_p/wavelength, ymult=clight/omega_p/wavelength, species='electrons', color="Reds", to_plot=False)
 phasespace(rundir=dirname,dataset='x2x1_m',time=time, xlim=[0,12], xmult=clight/omega_p/wavelength, ymult=clight/omega_p/wavelength, species='electrons', color="copper", to_plot=False)
-field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], xmult=clight/omega_p/wavelength, ymult=clight/omega_p/wavelength, color='RdBu')
+field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], xmult=clight/omega_p/wavelength, ymult=clight/omega_p/wavelength, intensitymult=Eamp, color='RdBu')
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
-if (False):
-    create_movie(filename=dataset+".gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
+if (True):
+    create_movie(filename=dataset+"-2.gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
