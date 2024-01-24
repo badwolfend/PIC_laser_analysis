@@ -145,34 +145,39 @@ def order_files_by_number(directory, dataset='e1'):
     sorted_files = sorted(files_with_numbers, key=lambda x: x[1])
     return [odir+"/"+fn[0]+".h5" for fn in sorted_files]
 
-def generate_plot(frame_number, flist, is1d, ax):
+def generate_plot(frame_number, flist, is1d, axes, xmult=1, ymult=1, intensitymult=1):
     """
     Function to generate each plot. You can modify this function to create different plots.
     """
-    ax.clear()
+    axes[0].clear()
+    axes[1].clear()
+    ax=axes[0]
+    ax2=axes[1]
     fhere = h5py.File(flist[frame_number], 'r')
-
+    print(frame_number)
     if(len(fhere['AXIS']) == 2):
         xaxismin = fhere['AXIS']['AXIS1'][0]
         xaxismax = fhere['AXIS']['AXIS1'][1]
         yaxismin = fhere['AXIS']['AXIS2'][0]
         yaxismax = fhere['AXIS']['AXIS2'][1]
         if is1d:
-            num_points = fhere[dataset].shape[1]
-            x = np.linspace(start=xaxismin, stop=xaxismax, num=num_points)
-            y = np.mean(fhere[dataset], axis=0)
+            num_pointsx = fhere[dataset].shape[1]
+            num_pointsy = fhere[dataset].shape[0]
+
+            x = xmult*np.linspace(start=xaxismin, stop=xaxismax, num=num_pointsx)
+            y = ymult*np.mean(fhere[dataset], axis=0)
+            y = ymult*fhere[dataset][int(num_pointsy/2),:]
             ax.plot(x, y, "r")
-            ylimabs = 0.01
-            ylim(-ylimabs, ylimabs)
+            ax.set_ylim(-intensitymult, intensitymult)
 
             try:
                 fdens = flist[frame_number].split("MS")[0]+"MS/PHA/x2x1_m/electrons/x2x1_m-electrons-"+flist[frame_number].split(".h5")[0].split("-")[-1]+".h5"
-                print(fdens)
                 fheredens = h5py.File(fdens, "r")
                 y = np.mean(fheredens["x2x1_m"], axis=0)
-                maxy = np.max(np.abs(y))
-                y = y*ylimabs/(1.02*maxy)
-                ax.plot(x,y)
+                ylimabs = 0.5
+                ax2.plot(x,ylimabs*y)
+                ax2.set_ylim(0, 0.75)
+
             except:
                 print("No density data!")
                 
@@ -190,7 +195,7 @@ def generate_plot(frame_number, flist, is1d, ax):
                 print("No density data!")
                 # plt.colorbar(orientation='vertical')
 
-def create_movie(filename, num_frames=100, fps=10, flist=[]):
+def create_movie(filename, num_frames=100, fps=10, flist=[], xmult=1, ymult=1, intensitymult=1):
     """
     Function to create a movie from a sequence of plots.
     """
@@ -204,9 +209,10 @@ def create_movie(filename, num_frames=100, fps=10, flist=[]):
 
     # Create a figure and axis for the plot
     fig, ax = plt.subplots()
+    ax2 = ax.twinx()
 
     # Creating an animation by updating the plot for each frame
-    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(flist, True, ax,))
+    animation = FuncAnimation(fig, generate_plot, frames=num_frames, fargs=(flist, True, [ax, ax2], xmult, ymult, intensitymult))
 
     # Save the animation as a GIF (you can also save it as mp4 or other formats)
     writer = PillowWriter(fps=fps)
@@ -491,10 +497,25 @@ def fit_to_gaussian(x_data, y_data):
     return params
 
 datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
+# datadir = 'D:\XSPL\Lasers\Simulations\Bluehive\OSIRIS\LasersDeck\'
+
+# Example: External drive is assigned drive letter 'E:'
+drive_letter = 'D:'
+file_path_on_external_drive = 'XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/' 
+
+# Construct the full file path
+full_file_path = drive_letter + '\\' + file_path_on_external_drive
+datadir = full_file_path
+
+# List directory contents #
+# print(os.listdir('../../../../../../../../../../../../../'))
+
 # datadir = os.getcwd()+"/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/"
 
 dirname = datadir+'Laser2D'
 dirname = datadir+'Laser2D_n_ncrit_0p5'
+# dirname = datadir+'Laser1D_n_ncrit_0p5'
+
 # dirname = datadir+'Laser2D_n_ncrit_laserunits'
 # dirname = datadir+'Laser2D_n_ncrit_lu_pulse'
 # dirname = datadir+'langdon-fixed'
@@ -537,7 +558,7 @@ sorted_files = order_files_by_number(directory=dirname, dataset=dataset)
 ncrit_m3 = find_critical_dens(0.532)
 ncrit_cm3 = ncrit_m3*(1e-6)
 
-time = 150
+time = 20
 # make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 make_contour2(rundir=dirname,dataset='p3x2',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
@@ -547,4 +568,4 @@ field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], xmult=clight/omega_p/wa
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
 if (True):
-    create_movie(filename=dataset+"-2.gif", num_frames=len(sorted_files), fps=5, flist=sorted_files)
+    create_movie(filename=dataset+".gif", num_frames=len(sorted_files), fps=5, flist=sorted_files, xmult=clight/omega_p/wavelength, ymult=Eamp, intensitymult=Emax)
