@@ -144,10 +144,23 @@ def read_h5(filename, path=None, axis_name="AXIS/AXIS"):
         axis_number += 1
 
     # we need a loop here primarily (I think) for n_ene_bin phasespace data
-    the_data_hdf_object = n_data
-    # for the_data_hdf_object in n_data:
+    # Check if n_data is a list of data arrays
+    if isinstance(n_data, list):
+        print("n_data is a list")
+        if len(n_data) > 1:
+            print("Warning: more than one data array found in the hdf5 file. Only the first one will be read in.")
+            the_data_hdf_object = n_data[0]
+        else:
+            the_data_hdf_object = n_data[0]
+    else:
+        print("n_data is not a list")
+        the_data_hdf_object = n_data
         
-    name = the_data_hdf_object.name[1:]  # ignore the beginning '/'
+    # for the_data_hdf_object in n_data:
+    if the_data_hdf_object.name[0] == '/':
+        name = the_data_hdf_object.name[1:]  # ignore the beginning '/'
+    else:
+        name = the_data_hdf_object.name  # ignore the beginning '/'
 
     # now read in attributes of the ROOT of the hdf5..
     #   there's lots of good info there. strip out the array if value is a string

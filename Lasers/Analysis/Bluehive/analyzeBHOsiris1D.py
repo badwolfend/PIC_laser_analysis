@@ -14,7 +14,7 @@ full_file_path = drive_letter + '\\' + file_path_on_external_drive
 datadir = full_file_path
 
 # List directory contents #
-dirname = datadir+'Laser1D_n_ncrit_0p5'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
 dataset = 'e3'
 
 # Define save directory #
@@ -65,7 +65,7 @@ t0 = 1/omega_p
 e0 = Eamp
 b0 = e0/clight
 j0 = b0/l0_m/mu_0
-time = 50
+time = 55
 time_fs = time*t0*1e15
 # make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 # make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
@@ -74,10 +74,11 @@ time_fs = time*t0*1e15
 # utp.phasespace(rundir=dirname,dataset='x1_m',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="copper", to_plot=False)
 # utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
 # utp.field(rundir=dirname,dataset='j3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
+utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True)
 utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_save=True, save_dir=save_dir)
 utp.fields(rundir=dirname,dataset=['j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[j0], colors=['b-'], 
            to_normalize=False, to_save=True, save_dir=save_dir)
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
-if (True):
+if (False):
     utp.create_movie(dataset='e3', filename=dataset+".gif", num_frames=len(sorted_files), fps=5, flist=sorted_files, xmult=clight/omega_p/wavelength, ymult=Eamp, intensitymult=Emax)

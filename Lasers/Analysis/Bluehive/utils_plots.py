@@ -35,7 +35,7 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
               break
 
       fhere = h5py.File(files[i], 'r')
-      plt.title(str(dataset)+' fields at t = '+str(tmult*fhere.attrs['TIME']))
+      plt.title(str(dataset)+' fields at t = '+str(tmult*fhere.attrs['TIME'])+", timestep = "+str(i))
 
       if(len(fhere['AXIS']) == 1):
           plt.ylabel('$n [n_0]$')
@@ -250,7 +250,7 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
         plt.show()
 
 def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0,
-    xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
+    xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
     plotdata=[], color=None, to_plot=True):
 
     workdir = os.getcwd()
@@ -272,7 +272,7 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
 
     runatts = phase_space.run_attrs
     title=runatts['NAME']
-    time=phase_space.run_attrs['TIME'][0]
+    time=tmult*phase_space.run_attrs['TIME'][0]
 
     ext_stuff=[xmult*phase_space.axes[1].min,xmult*phase_space.axes[1].max,ymult*phase_space.axes[0].min,ymult*phase_space.axes[0].max]
     data_max=max(np.abs(np.amax(phase_space)),100)
