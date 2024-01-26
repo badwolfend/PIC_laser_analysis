@@ -9,15 +9,22 @@ import numpy as np
 from osh5def import H5Data, PartData, fn_rule, DataAxis, OSUnits
 import os
 import utils as ut
-
+import pickle
+font = {'family' : 'Times',
+        'size'   : 22}
 def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
-    xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,
-    plotdata=[], color=None, to_plot=True, **kwargs):
+    xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=[1],
+    plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', **kwargs):
+    data_tosave = {}
 
     fig, ax = plt.subplots(figsize=(12, 6))
-    plt.xlabel('$x_1 [c/\omega_p]$')
+    fig.set_size_inches(13.385, 6.0)
 
-    for data in dataset:
+    plt.xlabel('$x_1 [\lambda_L]$')
+    
+    save_string = "vars"
+    for id, data in enumerate(dataset):
+      save_string += "_"+data  
       files = ut.find_files_associated_with_dataset(rundir, dataset=data)
 
       i = 0
@@ -37,13 +44,43 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
 
       if(len(fhere['AXIS']) == 1):
 
-          xaxismin = xmult*fhere['AXIS']['AXIS1'][0]
-          xaxismax = xmult*fhere['AXIS']['AXIS1'][1]
+        xaxismin = xmult*fhere['AXIS']['AXIS1'][0]
+        xaxismax = xmult*fhere['AXIS']['AXIS1'][1]
 
-          nx = len(fhere[data][:])
-          dx = (xaxismax-xaxismin)/nx
+        nx = len(fhere[data][:])
+        dx = (xaxismax-xaxismin)/nx
+        xaxis = np.linspace(start=xaxismin, stop=xaxismax, num=nx) 
+        xstart = np.where(xaxis < 4 )[0][-1]
+        xstop = np.where(xaxis < 8 )[0][-1] 
+        data_tosave[data] = fhere[data][:]
 
-          plt.plot(np.arange(0,xaxismax,dx),fhere[data][:])
+        if to_normalize:
+            y = fhere[data][:]
+            ynorm = y/np.max(np.abs(y))
+            if data == 'j3':
+                ax.plot(xaxis[xstart:xstop],ynorm[xstart:xstop], colors[id], linewidth=4, label=data)
+            else:
+                ax.plot(xaxis, ynorm, colors[id], linewidth=4, label=data)
+            ax.set_ylim(-1.1, 1.1)
+            ax.set_ylabel("Normalized Field")
+        else:
+            ax.plot(xaxis,intensitymult[id]*fhere[data][:], linewidth=4, label=data)
+            ax.set_ylabel("Field")
+
+        try:
+            ax2 = ax.twinx()
+            fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/electrons/x1_m-electrons-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
+            fheredens = h5py.File(fdens, "r")
+            y = fheredens["x1_m"][:]
+            ylimabs = 0.5
+            ax2.plot(np.arange(0,xaxismax,dx),ylimabs*y, 'k-', linewidth=4, label=data)
+            ax2.set_ylim(-0.01, 0.6)
+            ax2.set_ylabel("N/N_0")
+            data_tosave["x1_m"] = y
+
+
+        except:
+            print("No density data!")
 
       elif(len(fhere['AXIS']) == 2):
 
@@ -52,10 +89,10 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
           yaxismin = ymult*fhere['AXIS']['AXIS2'][0]
           yaxismax = ymult*fhere['AXIS']['AXIS2'][1]
 
-          if color != None:
+          if colors != None:
               plt.imshow(intensitymult*fhere[data][:,:]+1e-12,
                         aspect='auto',
-                        extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=color)
+                        extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=colors[id])
               # plt.imshow(intensitymult*fhere[dataset][:,:]+1e-12,
               #         aspect='auto',
               #         extent=[xaxismin, xaxismax, yaxismin, yaxismax], cmap=color, vmin=-0.006, vmax=0.006)           
@@ -72,7 +109,11 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
           plt.ylim(ylim)
       if(zlim != [-1,-1]):
           plt.clim(zlim)
-
+    if to_save:
+        run_name = rundir.split("/")[-1]   
+        save_name = save_dir+"Data/"+run_name+"_"+save_string+"_time_"+str(i)
+        pickle.dump(data_tosave, open(save_name+".p", "wb"))  
+        plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
     if to_plot:
         plt.show()
 

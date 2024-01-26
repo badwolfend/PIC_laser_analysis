@@ -4,7 +4,6 @@ import utils as ut
 import utils_plots as utp
 
 datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
-# datadir = 'D:\XSPL\Lasers\Simulations\Bluehive\OSIRIS\LasersDeck\'
 
 # Example: External drive is assigned drive letter 'E:'
 drive_letter = 'D:'
@@ -16,9 +15,10 @@ datadir = full_file_path
 
 # List directory contents #
 dirname = datadir+'Laser1D_n_ncrit_0p5'
-
 dataset = 'e3'
 
+# Define save directory #
+save_dir = drive_letter+'\\'+'XSPL/Lasers/Outputs/'
 # Define laser and plasma parameters #
 m_e = 9.109383e-31
 elc = 1.602177e-19
@@ -53,22 +53,30 @@ directory_path = dirname
 sorted_files = ut.order_files_by_number(directory=dirname, dataset=dataset)
 # print(sorted_files)
 
-ncrit_m3 = ut.find_critical_dens(0.532)
+ncrit_m3 = ut.find_critical_dens(0.527)
 ncrit_cm3 = ncrit_m3*(1e-6)
+print("Half Critical density: "+str(ncrit_m3/2)+" m^-3")
 
 # Compute units for length, time, and electric field #
+mu_0 = 4*np.pi*1e-7
 l0 = clight/omega_p/wavelength # Interms of wavelength
+l0_m = clight/omega_p
 t0 = 1/omega_p
 e0 = Eamp
-
-time = 40
+b0 = e0/clight
+j0 = b0/l0_m/mu_0
+time = 50
+time_fs = time*t0*1e15
 # make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 # make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 # make_contour2(rundir=dirname,dataset='p3x2',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
-utp.phasespace(rundir=dirname,dataset='x1_ene',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="Reds", to_plot=False)
-utp.phasespace(rundir=dirname,dataset='x1_m',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="copper", to_plot=False)
-utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
-utp.fields(rundir=dirname,dataset=['e3', 'j3'],time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=e0, color='RdBu')
+# utp.phasespace(rundir=dirname,dataset='x1_ene',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="Reds", to_plot=False)
+# utp.phasespace(rundir=dirname,dataset='x1_m',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="copper", to_plot=False)
+# utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
+# utp.field(rundir=dirname,dataset='j3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
+utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_save=True, save_dir=save_dir)
+utp.fields(rundir=dirname,dataset=['j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[j0], colors=['b-'], 
+           to_normalize=False, to_save=True, save_dir=save_dir)
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
 if (True):
