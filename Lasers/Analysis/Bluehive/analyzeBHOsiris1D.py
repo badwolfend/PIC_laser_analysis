@@ -3,22 +3,31 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
+osx = True
 
-# Example: External drive is assigned drive letter 'E:'
-drive_letter = 'D:'
-file_path_on_external_drive = 'XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/' 
+if osx: 
+    datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
 
-# Construct the full file path
-full_file_path = drive_letter + '\\' + file_path_on_external_drive
-datadir = full_file_path
+    # Define save directory #
+    save_dir = '/Volumes/T9/XSPL/Lasers/Outputs/'
 
-# List directory contents #
+else:
+
+    # Example: External drive is assigned drive letter 'E:'
+    drive_letter = 'D:'
+    file_path_on_external_drive = 'XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/' 
+
+    # Construct the full file path
+    full_file_path = drive_letter + '\\' + file_path_on_external_drive
+    datadir = full_file_path
+
+    # Define save directory #
+    save_dir = drive_letter+'\\'+'XSPL/Lasers/Outputs/'
+
+# Define specific run now #
 dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
 dataset = 'e3'
 
-# Define save directory #
-save_dir = drive_letter+'\\'+'XSPL/Lasers/Outputs/'
 # Define laser and plasma parameters #
 m_e = 9.109383e-31
 elc = 1.602177e-19
@@ -48,11 +57,6 @@ print("Emax: "+f"{Emax:.2e}")
 n_wavelengths = 12 # How many wavelengths to span in the x1 direction
 xsim = (n_wavelengths*wavelength)*omega_p/clight # Length of simulation in x1 direction unitless
 
-# Example usage
-directory_path = dirname 
-sorted_files = ut.order_files_by_number(directory=dirname, dataset=dataset)
-# print(sorted_files)
-
 ncrit_m3 = ut.find_critical_dens(0.527)
 ncrit_cm3 = ncrit_m3*(1e-6)
 print("Half Critical density: "+str(ncrit_m3/2)+" m^-3")
@@ -74,7 +78,7 @@ time_fs = time*t0*1e15
 # utp.phasespace(rundir=dirname,dataset='x1_m',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="copper", to_plot=False)
 # utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
 # utp.field(rundir=dirname,dataset='j3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
-utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True)
+utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True, to_save=True, save_dir=save_dir)
 utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_save=True, save_dir=save_dir)
 utp.fields(rundir=dirname,dataset=['j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[j0], colors=['b-'], 
            to_normalize=False, to_save=True, save_dir=save_dir)

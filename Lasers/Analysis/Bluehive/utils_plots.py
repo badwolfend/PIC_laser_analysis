@@ -251,7 +251,9 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
 
 def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0,
     xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
-    plotdata=[], color=None, to_plot=True):
+    plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./'):
+    
+    save_string = "vars_"+dataset+"_"+species
 
     workdir = os.getcwd()
     workdir = os.path.join(workdir, rundir)
@@ -268,7 +270,7 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     print(os.path.join(odir,files[i]))
     phase_space = np.abs(ut.read_h5(os.path.join(odir,files[i])))
 
-    fig, (phase_plot, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [3, 1]})
+    fig, (phase_plot, ax2) = plt.subplots(1, 2, figsize=(13.385, 6), gridspec_kw={'width_ratios': [3, 1]})
 
     runatts = phase_space.run_attrs
     title=runatts['NAME']
@@ -281,14 +283,14 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     yaxis = np.linspace(ext_stuff[2], ext_stuff[3], phase_space.shape[0])
     XX, YY = np.meshgrid(xaxis, yaxis)
 
-    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='Spectral')
+    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='twilight', vmin=0, vmax=300)
     # phase_contour=phase_plot.contourf(phase_space,extent=ext_stuff, cmap='Spectral', levels=100)
     phase_plot.set_title(species+' '+dataset+' at t = '+str(time))
-    phase_plot.set_xlabel('Position [$c / \omega_{p}$]')
-    phase_plot.set_ylabel('Proper Velocity $\gamma v_1$ [ c ]')
+    phase_plot.set_xlabel('Position [$\lambda_{L}$]')
+    phase_plot.set_ylabel('Proper Velocity $\gamma v_1$ [ c ]', labelpad=20)
     # Mark the line-out location on the 2D plot
     phase_plot.axvline(x=line_out_x, color='red', linestyle='--')
-    cbar = fig.colorbar(phase_contour, ax=phase_plot)
+    # cbar = fig.colorbar(phase_contour, ax=phase_plot)
 
     # Create the side 1D plot
     line_out_index = np.argmin(np.abs(xaxis - line_out_x))
@@ -310,13 +312,17 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     ax2.plot(y_fit, yaxis, color='red')
     ax2.set_title("1D Line-out at x={}".format(line_out_x))
     ax2.set_xlabel("Value")
-    ax2.set_ylabel("Y axis")
     ax2.yaxis.tick_right()
 
     plt.tight_layout()
 
+    if to_save:
+        run_name = rundir.split("/")[-1]   
+        # save_name = save_dir+"Data/"+run_name+"_"+save_string+"_time_"+str(i)
+        # pickle.dump(data_tosave, open(save_name+".p", "wb"))  
+        plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
     if to_plot:
-        plt.show()  
+        plt.show() 
 
 def make_contour(rundir='',dataset='p1x1',species='electrons',time=0,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
