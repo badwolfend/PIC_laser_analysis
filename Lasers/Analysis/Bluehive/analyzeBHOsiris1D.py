@@ -3,7 +3,7 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = True
+osx = False
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
@@ -25,7 +25,11 @@ else:
     save_dir = drive_letter+'\\'+'XSPL/Lasers/Outputs/'
 
 # Define specific run now #
-dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192_S_x10'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long'
+# dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
+S = 3.5e17 # W/m^2
+
 dataset = 'e3'
 
 # Define laser and plasma parameters #
@@ -34,6 +38,7 @@ elc = 1.602177e-19
 eps0 = 8.854188e-12
 clight = 3e8 # m/s
 wavelength = 527e-9 # m
+wavelength_um = wavelength*1e6 # um
 n_over_ncrit = 0.5
 omega_L = 2*np.pi*clight/wavelength # rad/s    
 omega_p = omega_L*np.sqrt(n_over_ncrit) # rad/s
@@ -46,10 +51,17 @@ conv = (1/one_over_conv)*1e-9*1e-2 # Convert from 1/m to 1/cm
 print("Conversion factor: "+str(conv))
 
 # Compute the electric field given intensity and wavelength #
-S = 3.5e16 # W/m^2
+S_cm = S/(100**2) # W/cm^2
 Emax = np.sqrt(2*S/(eps0*clight))
 a0 = Emax*(elc*wavelength/(2*np.pi*m_e*clight**2))
-print(a0)
+
+a0_theory = 0.85*np.sqrt((wavelength_um)**2*S_cm/1e18)
+print("a0: "+str(a0)+", a0 theory: "+str(a0_theory))
+
+v_o_c = 0.0084
+gamma = 1/np.sqrt(1-v_o_c**2)
+print("Gamma: "+str(gamma))
+
 # Print value in scientific notation #
 print("Emax: "+f"{Emax:.2e}")
 
@@ -69,7 +81,7 @@ t0 = 1/omega_p
 e0 = Eamp
 b0 = e0/clight
 j0 = b0/l0_m/mu_0
-time = 55
+time = 1480
 time_fs = time*t0*1e15
 # make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 # make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
@@ -78,11 +90,15 @@ time_fs = time*t0*1e15
 # utp.phasespace(rundir=dirname,dataset='x1_m',time=time, xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, species='electrons', color="copper", to_plot=False)
 # utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
 # utp.field(rundir=dirname,dataset='j3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=Eamp, color='RdBu')
-utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True, to_save=True, save_dir=save_dir)
-utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_save=True, save_dir=save_dir)
-utp.fields(rundir=dirname,dataset=['j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[j0], colors=['b-'], 
+# utp.make_contour2(rundir=dirname,dataset='p3x1',time=0, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True, to_save=True, save_dir=save_dir)
+# utp.make_contour2(rundir=dirname,dataset='gammax1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True, to_save=True, save_dir=save_dir)
+utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=True, save_dir=save_dir)
+utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_plot=False, to_save=True, save_dir=save_dir)
+utp.fields(rundir=dirname,dataset=['e3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0], colors=['b-'], 
            to_normalize=False, to_save=True, save_dir=save_dir)
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
 if (False):
-    utp.create_movie(dataset='e3', filename=dataset+".gif", num_frames=len(sorted_files), fps=5, flist=sorted_files, xmult=clight/omega_p/wavelength, ymult=Eamp, intensitymult=Emax)
+    directory_path = dirname 
+    sorted_files = ut.order_files_by_number(directory=dirname, dataset=dataset)
+    utp.create_movie(dataset='e3', filename=dataset+".gif", num_frames=len(sorted_files), fps=5, flist=sorted_files, xmult=clight/omega_p/wavelength, ymult=Eamp, intensitymult=1e10)
