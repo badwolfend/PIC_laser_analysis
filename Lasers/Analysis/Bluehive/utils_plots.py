@@ -278,7 +278,7 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
 
     ext_stuff=[xmult*phase_space.axes[1].min,xmult*phase_space.axes[1].max,ymult*phase_space.axes[0].min,ymult*phase_space.axes[0].max]
     data_max=max(np.abs(np.amax(phase_space)),100)
-
+    print("y_min: "+str(phase_space.axes[0].min)+" y_max: "+str(phase_space.axes[0].max))
     xaxis = np.linspace(ext_stuff[0], ext_stuff[1], phase_space.shape[1])
     yaxis = np.linspace(ext_stuff[2], ext_stuff[3], phase_space.shape[0])
     XX, YY = np.meshgrid(xaxis, yaxis)
@@ -307,10 +307,11 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
 
     # Now also plot the 1 eV Maxwellian
     maxwellian = ut.gaussian(yaxis, pfit[0], pfit[1], np.sqrt(elc/(m_e*1*clight**2)))
-    ax2.plot(maxwellian, yaxis, color='black', linestyle='--')
-    ax2.plot(line_out_values, yaxis, color='blue')
-    ax2.plot(y_fit, yaxis, color='red')
+    ax2.plot(maxwellian, yaxis, color='black', linestyle='--', linewidth=4)
+    ax2.plot(line_out_values, yaxis, color='blue', linewidth=3)
+    ax2.plot(y_fit, yaxis, color='red', linewidth=2)
     ax2.set_title("1D Line-out at x={}".format(line_out_x))
+    ax2.set_ylim(ext_stuff[2], ext_stuff[3])
     ax2.set_xlabel("Value")
     ax2.yaxis.tick_right()
 
