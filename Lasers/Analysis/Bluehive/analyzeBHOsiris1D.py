@@ -3,7 +3,7 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = False
+osx = True
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
@@ -70,6 +70,7 @@ n_wavelengths = 12 # How many wavelengths to span in the x1 direction
 xsim = (n_wavelengths*wavelength)*omega_p/clight # Length of simulation in x1 direction unitless
 
 ncrit_m3 = ut.find_critical_dens(0.527)
+print("Critical density: "+str(ncrit_m3)+" m^-3")
 ncrit_cm3 = ncrit_m3*(1e-6)
 print("Half Critical density: "+str(ncrit_m3/2)+" m^-3")
 
