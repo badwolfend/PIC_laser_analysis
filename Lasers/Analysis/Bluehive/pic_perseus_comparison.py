@@ -107,7 +107,7 @@ for fi, fpic in enumerate(fname_pic):
 
     # plt.tight_layout()
     # fig.savefig(savedir+fname_pic+fname_perseus+'j3_comparison.png', dpi=300)
-    # ax.set_title('Density at t='+str(time_pic))
+    # ax12.set_title('Density at t='+str(time_pic))
 
     ###########
     # Plot b2 #
