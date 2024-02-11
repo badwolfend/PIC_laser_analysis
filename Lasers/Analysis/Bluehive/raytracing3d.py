@@ -24,8 +24,8 @@ def plot_ray_path_3d_pyvis(plotter, path, plasma_density_3d=None, A=1, B=0.01, C
 
     # Plot isosurfaces
     if plotter == None:
-      plotter = pv.Plotter(off_screen=True)
-      # plotter = pv.Plotter()
+    #   plotter = pv.Plotter(off_screen=True)
+      plotter = pv.Plotter()
     if True:
       threshed_mesh = grid.threshold(value=0.01, scalars="densities")
       slices = threshed_mesh.slice_orthogonal()
@@ -385,6 +385,18 @@ plotter.camera_position = [(3, -3, 3), (0, 0, 0), (0, 0, 1)]
 
 # plotter.view_vector([2, -2, 4])
 plotter.remove_scalar_bar()
-plotter.screenshot(r'D:\\'+'XSPL/Proposals/LCLS/2024/Figures\Plots/bennett_r_85um_with_mec_cpp_150um_nobar.png')  
-plotter.save_graphic(r'D:\\'+'XSPL/Proposals/LCLS/2024/Figures\Plots/bennett_r_85um_with_mec_cpp_150um_nobar.svg') 
+
+osx = True
+# if osx:
+#     savedir = '/Volumes/T9/XSPL/Proposals/LCLS/2024/Figures/Plots/'
+# else:
+#     # Example: External drive is assigned drive letter 'E:'
+#     drive_letter = 'D:'
+#     plot_path_on_external_drive = 'XSPL/Proposals/LCLS/2024/Figures\Plots' 
+#     # Construct the full file path
+#     savedir = drive_letter+'\\'+plot_path_on_external_drive
+
+
+# plotter.screenshot(r'D:\\'+'XSPL/Proposals/LCLS/2024/Figures\Plots/bennett_r_85um_with_mec_cpp_150um_nobar.png')  
+# plotter.save_graphic(r'D:\\'+'XSPL/Proposals/LCLS/2024/Figures\Plots/bennett_r_85um_with_mec_cpp_150um_nobar.svg') 
 plotter.show()
