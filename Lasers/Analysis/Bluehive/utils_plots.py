@@ -25,8 +25,8 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
     save_string = "vars"
     for id, data in enumerate(dataset):
       save_string += "_"+data  
-      files = ut.find_files_associated_with_dataset(rundir, dataset=data)
-
+    #   files = ut.find_files_associated_with_dataset(rundir, dataset=data)
+      files = ut.order_files_by_number(rundir, dataset=data)
       i = 0
       for j in range(len(files)):
           fhere = h5py.File(files[j], 'r')

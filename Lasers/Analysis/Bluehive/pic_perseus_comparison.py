@@ -5,7 +5,8 @@ import utils as ut
 osx = False
 # time_pic = 92
 # time_perseus = 180
-time_pic = 247
+time_pic = 2470
+time_pic = 2471
 time_perseus = 494
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'

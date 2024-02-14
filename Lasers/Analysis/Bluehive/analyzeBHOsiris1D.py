@@ -3,7 +3,7 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = True
+osx = False
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
@@ -83,6 +83,8 @@ e0 = Eamp
 b0 = e0/clight
 j0 = b0/l0_m/mu_0
 time = 1480
+time = 14825
+time = 8000
 time_fs = time*t0*1e15
 # make_contour(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12],  xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
 # make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False)
