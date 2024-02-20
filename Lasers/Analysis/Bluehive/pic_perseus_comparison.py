@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
 osx = False
-# time_pic = 92
-# time_perseus = 180
-time_pic = 2470
-time_pic = 2471
+
+# time_pic = 2471
+# time_perseus = 494
+time_pic = 2465
 time_perseus = 494
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'
@@ -24,7 +24,7 @@ fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_vars_e3_b2_j3_time_'+str(time_pic), 'L
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e16_time_'+str(time_perseus), 'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_time_'+str(time_perseus)]
 
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
-fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_t_long_time_'+str(time_perseus)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
 
 fpicstr =''
 
