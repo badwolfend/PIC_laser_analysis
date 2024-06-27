@@ -95,9 +95,9 @@ for fi, fpic in enumerate(fname_pic):
 
     # Set size of plot 
     fig1.set_size_inches(13.385, 6.0)
-
-    ax1.plot(x_pic[xstart_pic:xstop_pic], j0*data_pic['j3'][xstart_pic:xstop_pic], label='PIC', color='xkcd:sky blue', linewidth=4)
-    ax1.plot(x_perseus[xstart_perseus:xstop_perseus],data_perseus['j3'][xstart_perseus:xstop_perseus], label='Perseus', color='xkcd:bright blue', linewidth=4, linestyle='--')
+    maxJpic = np.max(j0*data_pic['j3'][xstart_pic:xstop_pic])
+    ax1.plot(x_pic[xstart_pic:xstop_pic], j0*data_pic['j3'][xstart_pic:xstop_pic]/maxJpic, label='PIC', color='xkcd:sky blue', linewidth=4)
+    ax1.plot(x_perseus[xstart_perseus:xstop_perseus],data_perseus['j3'][xstart_perseus:xstop_perseus]/maxJpic, label='Perseus', color='xkcd:bright blue', linewidth=4, linestyle='--')
     ax1.set_xlabel('x [\lambda_L]')
     ax1.set_ylabel('E')
     ax1.set_xlim(0, 12)
