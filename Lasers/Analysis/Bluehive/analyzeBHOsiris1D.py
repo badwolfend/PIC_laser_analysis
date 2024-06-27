@@ -3,13 +3,13 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = False
+osx = True
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
-
     # Define save directory #
     save_dir = '/Volumes/T9/XSPL/Lasers/Outputs/'
+
 
 else:
 
@@ -27,6 +27,9 @@ else:
 # Define specific run now #
 dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192_S_x10'
 dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_4096_S_x10_long'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_128_S_x10_long'
+
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
 S = 3.5e17 # W/m^2
 

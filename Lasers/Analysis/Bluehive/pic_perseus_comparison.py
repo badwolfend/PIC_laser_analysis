@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
-osx = False
+osx = True
 
 # time_pic = 2471
 # time_perseus = 494
@@ -23,7 +23,7 @@ else:
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e16_time_'+str(time_perseus), 'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_time_'+str(time_perseus)]
 
-fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_4096_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
 
 fpicstr =''
