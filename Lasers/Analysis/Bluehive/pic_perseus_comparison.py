@@ -11,6 +11,7 @@ time_perseus = 494
 time_pic = 1787
 time_perseus = 492
 time_pic = 1786
+time_pic = 536
 time_perseus = 492
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'
@@ -36,8 +37,8 @@ fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_l
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
 
-fname_pic = ['Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wcoll_n0_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_2048_S_x10_long_wcoll_n0_vars_e3_b2_j3_time_'+str(time_pic)]
-fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
 
 pic_colors = {0:{'e3':'xkcd:light red', 'j3':'xkcd:sky blue', 'b2':'xkcd:green', 'ne':'k'}, 1:{'e3':'xkcd:light red', 'j3':'xkcd:cyan', 'b2':'xkcd:green','ne':'k'}}
 pic_alpha = [0.65, 0.90]

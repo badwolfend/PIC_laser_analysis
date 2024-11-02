@@ -32,7 +32,8 @@ dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_4096_S_x10_long'
 dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wcoll_n0'
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wocoll_n0'
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0'
-# dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_2048_S_x10_long_wcoll_n0'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_2048_S_x10_long_wcoll_n0'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14'
 
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
 S = 3.5e17 # W/m^2
@@ -94,7 +95,6 @@ j0 = b0/l0_m/mu_0
 time = 1480
 time = 14790
 time = 14780
-
 time_fs = time*t0*1e15
 
 xoutE, youtE = utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=e0, color='RdBu', to_plot=False)
