@@ -2,12 +2,16 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
-osx = True
+osx = False
 
 # time_pic = 2471
 # time_perseus = 494
 time_pic = 2465
 time_perseus = 494
+time_pic = 1787
+time_perseus = 492
+time_pic = 1786
+time_perseus = 492
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'
     savedir = '/Volumes/T9/XSPL/Lasers/Outputs/Plots/'
@@ -23,9 +27,22 @@ else:
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e16_time_'+str(time_perseus), 'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_time_'+str(time_perseus)]
 
-fname_pic = ['Laser1D_n_ncrit_0p5_Ne_4096_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
 
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_4096_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
+
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_8192_S_x10_long_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
+
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wcoll_n0_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_2048_S_x10_long_wcoll_n0_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
+
+pic_colors = {0:{'e3':'xkcd:light red', 'j3':'xkcd:sky blue', 'b2':'xkcd:green', 'ne':'k'}, 1:{'e3':'xkcd:light red', 'j3':'xkcd:cyan', 'b2':'xkcd:green','ne':'k'}}
+pic_alpha = [0.65, 0.90]
+perseus_colors = {0:{'e3':'xkcd:red', 'j3':'xkcd:bright blue', 'b2':'xkcd:blue green', 'ne':'xkcd:burnt umber'}, 1:{'e3':'xkcd:red', 'j3':'xkcd:bright blue', 'b2':'xkcd:blue green', 'ne':'xkcd:burnt umber'}}
+perseus_alpha = [1, 1]
 fpicstr =''
 
 fig0, ax0 = plt.subplots(1, 1)
@@ -33,7 +50,10 @@ fig1, ax1 = plt.subplots(1, 1)
 fig2, ax2 = plt.subplots(1, 1)
 
 for fi, fpic in enumerate(fname_pic):
-    fpicstr = fpicstr+fpic+'_'+fname_perseus[fi]+"_"
+    if fi == 0:
+        fpicstr = fpicstr+fpic+'_'+fname_perseus[fi]
+    else:
+        fpicstr = fpicstr+"_"+fpic
 
     # Load pickle from folder
     with open(datadir+fname_pic[fi]+'.p', 'rb') as f:
@@ -65,7 +85,9 @@ for fi, fpic in enumerate(fname_pic):
     e0 = 1/amp
     b0 = e0/clight
     j0 = b0/(mu_0*l0)
-
+    maxEperseus = np.max(data_perseus['e3'])  
+    maxJperseus = np.max(data_perseus['j3'])
+    maxBperseus = np.max(data_perseus['b2'])  
     ###########
     # Plot E3 #
     ###########
@@ -74,15 +96,17 @@ for fi, fpic in enumerate(fname_pic):
     # Set size of plot 
     fig0.set_size_inches(13.385, 6.0)
 
-    ax0.plot(x_pic, e0*data_pic['e3'], label='PIC', color='xkcd:light red', linewidth=4)
-    ax0.plot(x_perseus, data_perseus['e3'], label='Perseus', color='xkcd:red', linewidth=4, linestyle='--')
+    ax0.plot(x_pic, e0*data_pic['e3']/maxEperseus, label='PIC', color=pic_colors[fi]['e3'], linewidth=4, alpha=pic_alpha[fi])
+    ax0.plot(x_perseus, data_perseus['e3']/maxEperseus, label='Perseus', color=perseus_colors[fi]['e3'], linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax0.set_xlabel('x [\lambda_L]')
     ax0.set_ylabel('E')
     ax0.set_xlim(0, 12)
+    ax0.set_ylim(-1.1, 1.1)
     # ax.legend()
     ax02 = ax0.twinx()
-    ax02.plot(x_pic, 0.5*data_pic['x1_m'], color='k', label='PIC', linewidth=4)
-    ax02.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color='xkcd:grey', label='PIC', linewidth=4, linestyle='--')
+    ax02.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax02.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
+    ax02.set_ylim(-0.01, 0.6)
 
     # plt.tight_layout()
     # fig.savefig(savedir+fname_pic+fname_perseus+'e3_comparison.png', dpi=300)
@@ -96,15 +120,16 @@ for fi, fpic in enumerate(fname_pic):
     # Set size of plot 
     fig1.set_size_inches(13.385, 6.0)
     maxJpic = np.max(j0*data_pic['j3'][xstart_pic:xstop_pic])
-    ax1.plot(x_pic[xstart_pic:xstop_pic], j0*data_pic['j3'][xstart_pic:xstop_pic]/maxJpic, label='PIC', color='xkcd:sky blue', linewidth=4)
-    ax1.plot(x_perseus[xstart_perseus:xstop_perseus],data_perseus['j3'][xstart_perseus:xstop_perseus]/maxJpic, label='Perseus', color='xkcd:bright blue', linewidth=4, linestyle='--')
+    ax1.plot(x_pic[xstart_pic:xstop_pic], j0*data_pic['j3'][xstart_pic:xstop_pic]/maxJperseus, label='PIC', color=pic_colors[fi]['j3'], linewidth=4, alpha=0.8)
+    ax1.plot(x_perseus[xstart_perseus:xstop_perseus],data_perseus['j3'][xstart_perseus:xstop_perseus]/maxJperseus, label='Perseus', color=perseus_colors[fi]['j3'], linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax1.set_xlabel('x [\lambda_L]')
     ax1.set_ylabel('E')
     ax1.set_xlim(0, 12)
     # ax.legend()
     ax12 = ax1.twinx()
-    ax12.plot(x_pic, 0.5*data_pic['x1_m'], color='k', label='PIC', linewidth=4)
-    ax12.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color='xkcd:grey', label='PIC', linewidth=4, linestyle='--')
+    ax12.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax12.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
+    ax12.set_ylim(-0.01, 0.6)
 
     # plt.tight_layout()
     # fig.savefig(savedir+fname_pic+fname_perseus+'j3_comparison.png', dpi=300)
@@ -118,15 +143,17 @@ for fi, fpic in enumerate(fname_pic):
     # Set size of plot 
     fig2.set_size_inches(13.385, 6.0)
 
-    ax2.plot(x_pic, b0*data_pic['b2'], label='PIC', color='xkcd:green', linewidth=4)
-    ax2.plot(x_perseus, data_perseus['b2'], label='Perseus', color='xkcd:blue green', linewidth=4, linestyle='--')
+    ax2.plot(x_pic, b0*data_pic['b2']/maxBperseus, label='PIC', color=pic_colors[fi]['b2'], linewidth=4, alpha=pic_alpha[fi])
+    ax2.plot(x_perseus, data_perseus['b2']/maxBperseus, label='Perseus', color=perseus_colors[fi]['b2'], linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax2.set_xlabel('x [\lambda_L]')
     ax2.set_ylabel('E')
     ax2.set_xlim(0, 12)
+
     # ax.legend()
     ax22 = ax2.twinx()
-    ax22.plot(x_pic, 0.5*data_pic['x1_m'], color='k', label='PIC', linewidth=4)
-    ax22.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color='xkcd:grey', label='PIC', linewidth=4, linestyle='--')
+    ax22.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax22.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
+    ax22.set_ylim(-0.01, 0.6)
 
     # plt.tight_layout()
     # fig.savefig(savedir+fname_pic+fname_perseus+'b2_comparison.png', dpi=300)

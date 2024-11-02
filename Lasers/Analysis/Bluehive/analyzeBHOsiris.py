@@ -509,7 +509,6 @@ datadir = full_file_path
 
 # List directory contents #
 # print(os.listdir('../../../../../../../../../../../../../'))
-
 # datadir = os.getcwd()+"/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/"
 
 dirname = datadir+'Laser2D'

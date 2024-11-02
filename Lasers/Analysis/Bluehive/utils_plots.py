@@ -70,6 +70,7 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
         try:
             ax2 = ax.twinx()
             fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/electrons/x1_m-electrons-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
+            # fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/ions/x1_m-ions-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
             fheredens = h5py.File(fdens, "r")
             y = fheredens["x1_m"][:]
             ylimabs = 0.5
@@ -121,6 +122,9 @@ def field(rundir='',dataset='e1',time=0,space=-1,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,
     plotdata=[], color=None, to_plot=True, **kwargs):
 
+    xout = []
+    yout = []
+
     workdir = os.getcwd()
     workdir = os.path.join(workdir, rundir)
 
@@ -151,8 +155,10 @@ def field(rundir='',dataset='e1',time=0,space=-1,
 
         nx = len(fhere[dataset][:])
         dx = (xaxismax-xaxismin)/nx
+        xout =list(np.arange(0,xaxismax,dx))
+        yout = intensitymult*fhere[dataset][:]
 
-        plt.plot(np.arange(0,xaxismax,dx),fhere[dataset][:])
+        plt.plot(np.arange(0,xaxismax,dx),intensitymult*fhere[dataset][:])
 
     elif(len(fhere['AXIS']) == 2):
 
@@ -184,6 +190,7 @@ def field(rundir='',dataset='e1',time=0,space=-1,
 
     if to_plot:
         plt.show()
+    return xout, yout
 
 def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,
@@ -249,7 +256,7 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
     if to_plot:
         plt.show()
 
-def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0,
+def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True,
     xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
     plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./'):
     
@@ -283,11 +290,11 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     yaxis = np.linspace(ext_stuff[2], ext_stuff[3], phase_space.shape[0])
     XX, YY = np.meshgrid(xaxis, yaxis)
 
-    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='twilight', vmin=0, vmax=300)
+    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='twilight', vmin=0, vmax=10)
     # phase_contour=phase_plot.contourf(phase_space,extent=ext_stuff, cmap='Spectral', levels=100)
-    phase_plot.set_title(species+' '+dataset+' at t = '+str(time))
     phase_plot.set_xlabel('Position [$\lambda_{L}$]')
     phase_plot.set_ylabel('Proper Velocity $\gamma v_1$ [ c ]', labelpad=20)
+
     # Mark the line-out location on the 2D plot
     phase_plot.axvline(x=line_out_x, color='red', linestyle='--')
     # cbar = fig.colorbar(phase_contour, ax=phase_plot)
@@ -297,23 +304,25 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     line_out_values = phase_space[:, line_out_index]
 
     ## Fit to Gaussian ##
-    pfit = ut.fit_to_gaussian(yaxis, line_out_values)
-    y_fit = ut.gaussian(yaxis, *pfit)
-    m_e = 9.109383e-31
-    elc = 1.602177e-19
-    clight = 3e8
-    temp = clight**2*m_e*((pfit[2])**2)/(elc) # in eV
-    print("Temperature: "+str(temp)+" eV")
+    if to_fit:
+        pfit = ut.fit_to_gaussian(yaxis, line_out_values)
+        y_fit = ut.gaussian(yaxis, *pfit)
+        m_e = 9.109383e-31
+        elc = 1.602177e-19
+        clight = 3e8
+        temp = clight**2*m_e*((pfit[2])**2)/(elc) # in eV
+        print("x="+str(line_out_x)+", Temperature: "+str(temp)+" eV")
+        phase_plot.set_title(species+' '+dataset+' at t = '+str(time)+', Temperature: '+str(temp)+' eV')
 
-    # Now also plot the 1 eV Maxwellian
-    maxwellian = ut.gaussian(yaxis, pfit[0], pfit[1], np.sqrt(elc/(m_e*1*clight**2)))
-    ax2.plot(maxwellian, yaxis, color='black', linestyle='--', linewidth=4)
-    ax2.plot(line_out_values, yaxis, color='blue', linewidth=3)
-    ax2.plot(y_fit, yaxis, color='red', linewidth=2)
-    ax2.set_title("1D Line-out at x={}".format(line_out_x))
-    ax2.set_ylim(ext_stuff[2], ext_stuff[3])
-    ax2.set_xlabel("Value")
-    ax2.yaxis.tick_right()
+        # Now also plot the 1 eV Maxwellian
+        maxwellian = ut.gaussian(yaxis, pfit[0], pfit[1], np.sqrt(elc/(m_e*1*clight**2)))
+        ax2.plot(maxwellian, yaxis, color='black', linestyle='--', linewidth=4)
+        ax2.plot(line_out_values, yaxis, color='blue', linewidth=3)
+        ax2.plot(y_fit, yaxis, color='red', linewidth=2)
+        ax2.set_title("1D Line-out at x={}".format(line_out_x))
+        ax2.set_ylim(ext_stuff[2], ext_stuff[3])
+        ax2.set_xlabel("Value")
+        ax2.yaxis.tick_right()
 
     plt.tight_layout()
 
