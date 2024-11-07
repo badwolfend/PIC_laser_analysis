@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
-osx = False
+osx = True
 
 # time_pic = 2471
 # time_perseus = 494

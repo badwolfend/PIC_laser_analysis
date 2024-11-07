@@ -3,14 +3,12 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = False
+osx = True
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
     # Define save directory #
     save_dir = '/Volumes/T9/XSPL/Lasers/Outputs/'
-
-
 else:
 
     # Example: External drive is assigned drive letter 'E:'

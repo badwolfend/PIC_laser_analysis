@@ -494,7 +494,7 @@ def init_colormap():
         color_map = matplotlib.colors.ListedColormap(rgb, name = 'Rainbow')
         color_map.set_under(rgb[0])
         color_map.set_over(rgb[-1])
-        matplotlib.cm.register_cmap(name='Rainbow', cmap=color_map)
+        # matplotlib.cm.register_cmap(name='Rainbow', cmap=color_map)
 init_colormap()
 
 """
