@@ -12,6 +12,32 @@ import utils as ut
 import pickle
 font = {'family' : 'Times',
         'size'   : 22}
+
+
+def save_temperature_time_series(rundir='',dataset='e3',time=[0,1],species='electrons', space=-1, xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,  plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', line_out_x_0=5.75, line_out_x_1=6.0, **kwargs):
+    save_string = "temperature"    
+    temp0_array = np.zeros(len(time))
+    temp1_array = np.zeros(len(time))
+    data_tosave = {}
+    for i, time in enumerate(time):
+        print("Time: "+str(time))
+        temp_0 = make_contour2(rundir=rundir,dataset=dataset,time=time, xlim=xlim, tmult=tmult, line_out_x =line_out_x_0, xmult=xmult, ymult=ymult, species=species, to_plot=to_plot, to_save=to_save, save_dir=save_dir, to_return_temp=True, to_clear=True)
+        temp_1 = make_contour2(rundir=rundir,dataset=dataset,time=time, xlim=xlim, tmult=tmult, line_out_x = line_out_x_1, xmult=xmult, ymult=ymult, species=species, to_plot=to_plot, to_save=to_save, save_dir=save_dir, to_return_temp=True, to_clear=True)
+        temp0_array[i] = temp_0
+        temp1_array[i] = temp_1
+
+    if to_save:
+        data_tosave["line_out_x_0"] = temp0_array 
+        data_tosave["line_out_x_1"] = temp1_array
+        data_tosave["time"] = time 
+        run_name = rundir.split("/")[-1]   
+        save_name = save_dir+"Data/"+run_name+"_"+save_string+"_times"
+        pickle.dump(data_tosave, open(save_name+".p", "wb"))  
+        plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
+    if to_plot:
+        plt.show()
+
+
 def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=[1],
     plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', **kwargs):
@@ -117,6 +143,19 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
         plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
     if to_plot:
         plt.show()
+
+def get_all_times(rundir='',dataset='e3'):
+    workdir = os.getcwd()
+    workdir = os.path.join(workdir, rundir)
+
+    odir = os.path.join(workdir, 'MS', 'FLD', dataset)
+    files = sorted(os.listdir(odir))
+
+    times = []
+    for j in range(len(files)):
+        fhere = h5py.File(os.path.join(odir,files[j]), 'r')
+        times.append(fhere.attrs['TIME'][0])
+    return times
 
 def field(rundir='',dataset='e1',time=0,space=-1,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,
@@ -256,9 +295,7 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
     if to_plot:
         plt.show()
 
-def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True,
-    xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
-    plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./'):
+def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
     
     save_string = "vars_"+dataset+"_"+species
 
@@ -290,7 +327,7 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     yaxis = np.linspace(ext_stuff[2], ext_stuff[3], phase_space.shape[0])
     XX, YY = np.meshgrid(xaxis, yaxis)
 
-    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='twilight', vmin=0, vmax=10)
+    phase_contour=phase_plot.pcolormesh(XX, YY, phase_space, cmap='twilight', vmin=0, vmax=60)
     # phase_contour=phase_plot.contourf(phase_space,extent=ext_stuff, cmap='Spectral', levels=100)
     phase_plot.set_xlabel('Position [$\lambda_{L}$]')
     phase_plot.set_ylabel('Proper Velocity $\gamma v_1$ [ c ]', labelpad=20)
@@ -332,7 +369,14 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
         # pickle.dump(data_tosave, open(save_name+".p", "wb"))  
         plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
     if to_plot:
-        plt.show() 
+        plt.show()
+    else:
+        if to_clear:
+            plt.close() 
+
+    if to_return_temp:
+        return temp
+    
 
 def make_contour(rundir='',dataset='p1x1',species='electrons',time=0,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1,
