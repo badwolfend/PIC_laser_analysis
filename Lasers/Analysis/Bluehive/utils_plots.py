@@ -14,22 +14,22 @@ font = {'family' : 'Times',
         'size'   : 22}
 
 
-def save_temperature_time_series(rundir='',dataset='e3',time=[0,1],species='electrons', space=-1, xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,  plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', line_out_x_0=5.75, line_out_x_1=6.0, **kwargs):
+def save_temperature_time_series(dataset='e3',times=[0,1],species='electrons', space=-1, xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=1,  plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', line_out_x_0=5.75, line_out_x_1=6.0, **kwargs):
+    rundir = kwargs.get('dirname', '')
     save_string = "temperature"    
-    temp0_array = np.zeros(len(time))
-    temp1_array = np.zeros(len(time))
+    temp0_array = np.zeros(len(times))
+    temp1_array = np.zeros(len(times))
     data_tosave = {}
-    for i, time in enumerate(time):
+    for i, time in enumerate(times):
         print("Time: "+str(time))
         temp_0 = make_contour2(rundir=rundir,dataset=dataset,time=time, xlim=xlim, tmult=tmult, line_out_x =line_out_x_0, xmult=xmult, ymult=ymult, species=species, to_plot=to_plot, to_save=to_save, save_dir=save_dir, to_return_temp=True, to_clear=True)
         temp_1 = make_contour2(rundir=rundir,dataset=dataset,time=time, xlim=xlim, tmult=tmult, line_out_x = line_out_x_1, xmult=xmult, ymult=ymult, species=species, to_plot=to_plot, to_save=to_save, save_dir=save_dir, to_return_temp=True, to_clear=True)
         temp0_array[i] = temp_0
         temp1_array[i] = temp_1
-
     if to_save:
         data_tosave["line_out_x_0"] = temp0_array 
         data_tosave["line_out_x_1"] = temp1_array
-        data_tosave["time"] = time 
+        data_tosave["time"] = tmult*times 
         run_name = rundir.split("/")[-1]   
         save_name = save_dir+"Data/"+run_name+"_"+save_string+"_times"
         pickle.dump(data_tosave, open(save_name+".p", "wb"))  

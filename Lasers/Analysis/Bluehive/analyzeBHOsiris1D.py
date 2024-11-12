@@ -3,7 +3,7 @@ from analysis import *
 import utils as ut
 import utils_plots as utp
 
-osx = False
+osx = True
 
 if osx: 
     datadir = '/Volumes/T9/XSPL/Lasers/Simulations/Bluehive/OSIRIS/LasersDeck/'
@@ -97,29 +97,18 @@ time = 14780
 time_fs = time*t0*1e15
 times = utp.get_all_times(dirname)
 
-utp.save_temperature_time_series(dirname=dirname, dataset='p3x1', time=times, t0=t0, tmult=10**15*t0, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', save_dir=save_dir, to_plot=True)
+# utp.save_temperature_time_series(dirname=dirname, dataset='p3x1', times=times, t0=t0, tmult=t0, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', save_dir=save_dir, to_plot=False)
 
 # xoutE, youtE = utp.field(rundir=dirname,dataset='e3',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=e0, color='RdBu', to_plot=False)
 # xoutB, youtB = utp.field(rundir=dirname,dataset='b2',time=time,xlim=[0,12], tmult=t0, xmult=l0, ymult=l0, intensitymult=b0, color='RdBu', to_plot=False)
 # utp.make_contour2(rundir=dirname,dataset='gammax1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=True, to_save=True, save_dir=save_dir)
 # utp.make_contour2(rundir=dirname,dataset='p1x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 5.75, to_fit=False, xmult=clight/omega_p/wavelength, ymult=1, species='ions', to_plot=False, to_save=True, save_dir=save_dir)
 # utp.make_contour2(rundir=dirname,dataset='p1x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6.0, to_fit=False, xmult=clight/omega_p/wavelength, ymult=1, species='ions', to_plot=False, to_save=True, save_dir=save_dir)
-temp_0 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 5.75, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=False, save_dir=save_dir, to_return_temp=True, to_clear=True)
-temp_1 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6.0, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=False, save_dir=save_dir, to_return_temp=True, to_clear=True)
-# utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_plot=False, to_save=True, save_dir=save_dir)
+temp_0 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 5.75, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=False, save_dir=save_dir, to_return_temp=True, to_clear=False)
+temp_1 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6.0, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=False, save_dir=save_dir, to_return_temp=True, to_clear=False)
+utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_plot=True, to_save=True, save_dir=save_dir)
 # utp.fields(rundir=dirname,dataset=['e3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0], colors=['b-'], 
         # to_normalize=False, to_save=True, save_dir=save_dir)
-
-
-# fig, ax = plt.subplots(1, 1)
-# fig.set_size_inches(13.385, 6.0)
-# ax.plot(times, temp0_array, label='temp0', color='r', linewidth=4)
-# ax.plot(times, temp1_array, label='temp1', color='b', linewidth=4)
-# ax.set_xlabel('x [\lambda_L]')
-# ax.set_ylabel('Temperature')
-# ax.legend()
-# fig.savefig(save_dir+'Plots/'+'temp_comparison.png', dpi=600)
-# plt.show()
 
 # Add each plot from the field function to a frame of a movie and store this movie as a file #
 if (False):

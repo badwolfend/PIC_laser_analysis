@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
-osx = False
+osx = True
 
 # time_pic = 2471
 # time_perseus = 494
@@ -12,7 +12,7 @@ time_pic = 1787
 time_perseus = 492
 time_pic = 1786
 time_pic = 536
-time_perseus = 492
+time_perseus = 495
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'
     savedir = '/Volumes/T9/XSPL/Lasers/Outputs/Plots/'
