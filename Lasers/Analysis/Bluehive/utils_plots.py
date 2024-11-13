@@ -9,6 +9,7 @@ import numpy as np
 from osh5def import H5Data, PartData, fn_rule, DataAxis, OSUnits
 import os
 import utils as ut
+import osh5vis as osh5vis
 import pickle
 font = {'family' : 'Times',
         'size'   : 22}
@@ -26,21 +27,27 @@ def save_temperature_time_series(dataset='e3',times=[0,1],species='electrons', s
         temp_1 = make_contour2(rundir=rundir,dataset=dataset,time=time, xlim=xlim, tmult=tmult, line_out_x = line_out_x_1, xmult=xmult, ymult=ymult, species=species, to_plot=to_plot, to_save=to_save, save_dir=save_dir, to_return_temp=True, to_clear=True)
         temp0_array[i] = temp_0
         temp1_array[i] = temp_1
-    if to_save:
         data_tosave["line_out_x_0"] = temp0_array 
         data_tosave["line_out_x_1"] = temp1_array
         data_tosave["time"] = tmult*times 
         run_name = rundir.split("/")[-1]   
         save_name = save_dir+"Data/"+run_name+"_"+save_string+"_times"
         pickle.dump(data_tosave, open(save_name+".p", "wb"))  
+    if to_save:
+        # data_tosave["line_out_x_0"] = temp0_array 
+        # data_tosave["line_out_x_1"] = temp1_array
+        # data_tosave["time"] = tmult*times 
+        # run_name = rundir.split("/")[-1]   
+        # save_name = save_dir+"Data/"+run_name+"_"+save_string+"_times"
+        # pickle.dump(data_tosave, open(save_name+".p", "wb"))  
         plt.savefig(save_dir+"Plots/"+run_name+"_"+save_string+"_time_"+str(i)+".png", dpi=600)
     if to_plot:
         plt.show()
 
 
-def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
+def fields(rundir='',dataset=['e3', 'j3'],mu=1, zeff=1, time=0,space=-1,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=[1],
-    plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', **kwargs):
+    plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', use_ions=False, **kwargs):
     data_tosave = {}
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -96,14 +103,19 @@ def fields(rundir='',dataset=['e3', 'j3'],time=0,space=-1,
         try:
             ax2 = ax.twinx()
             fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/electrons/x1_m-electrons-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
-            # fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/ions/x1_m-ions-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
+            ion_correction = 1  
+            if use_ions:
+                fdens = files[i].split("MS")[0]+"MS/PHA/x1_m/ions/x1_m-ions-"+files[i].split(".h5")[0].split("-")[-1]+".h5"
+                ion_correction = zeff/(mu*1836)
             fheredens = h5py.File(fdens, "r")
             y = fheredens["x1_m"][:]
-            ylimabs = 0.5
+            ylimabs = 0.5*ion_correction
+            # ylimabs = 1.9803477e+21
+            # ylimabs = 1
             ax2.plot(np.arange(0,xaxismax,dx),ylimabs*y, 'k-', linewidth=4, label=data)
             ax2.set_ylim(-0.01, 0.6)
             ax2.set_ylabel("N/N_0")
-            data_tosave["x1_m"] = y
+            data_tosave["x1_m"] = ylimabs*y
 
 
         except:
@@ -295,6 +307,31 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
     if to_plot:
         plt.show()
 
+
+def read_density(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
+    
+    save_string = "vars_"+dataset+"_"+species
+
+    workdir = os.getcwd()
+    workdir = os.path.join(workdir, rundir)
+
+    odir = os.path.join(workdir, 'MS', 'DENSITY', species, dataset)
+    files = sorted(os.listdir(odir))
+
+    i = 0
+    for j in range(len(files)):
+        fhere = h5py.File(os.path.join(odir,files[j]), 'r')
+        print(fhere.attrs['TIME'][0])
+        if(fhere.attrs['TIME'][0] >= time):
+            i = j
+            break
+    print(os.path.join(odir,files[i]))
+
+    dens=ut.read_h5(os.path.join(odir,files[i]))
+
+    den_plot = plt.subplot(223)
+    osh5vis.osplot(dens,title=species+' Density')
+    plt.show()
 def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
     
     save_string = "vars_"+dataset+"_"+species

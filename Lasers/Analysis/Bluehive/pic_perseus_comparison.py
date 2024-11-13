@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import utils as ut
-osx = True
+osx = False
 
 # time_pic = 2471
 # time_perseus = 494
@@ -39,6 +39,9 @@ fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_l
 
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14_vars_e3_b2_j3_time_'+str(time_pic), 'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus),'pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_time_'+str(time_perseus)]
+
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_time_'+str(time_perseus)]
 
 pic_colors = {0:{'e3':'xkcd:light red', 'j3':'xkcd:sky blue', 'b2':'xkcd:green', 'ne':'k'}, 1:{'e3':'xkcd:light red', 'j3':'xkcd:cyan', 'b2':'xkcd:green','ne':'k'}}
 pic_alpha = [0.65, 0.90]
@@ -105,7 +108,7 @@ for fi, fpic in enumerate(fname_pic):
     ax0.set_ylim(-1.1, 1.1)
     # ax.legend()
     ax02 = ax0.twinx()
-    ax02.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax02.plot(x_pic, data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
     ax02.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax02.set_ylim(-0.01, 0.6)
 
@@ -128,7 +131,7 @@ for fi, fpic in enumerate(fname_pic):
     ax1.set_xlim(0, 12)
     # ax.legend()
     ax12 = ax1.twinx()
-    ax12.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax12.plot(x_pic, data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
     ax12.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax12.set_ylim(-0.01, 0.6)
 
@@ -152,7 +155,7 @@ for fi, fpic in enumerate(fname_pic):
 
     # ax.legend()
     ax22 = ax2.twinx()
-    ax22.plot(x_pic, 0.5*data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax22.plot(x_pic, data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
     ax22.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax22.set_ylim(-0.01, 0.6)
 

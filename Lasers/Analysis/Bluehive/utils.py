@@ -1,4 +1,5 @@
 from scipy.optimize import curve_fit
+from scipy import integrate
 import matplotlib.pyplot as plt
 import h5py
 import numpy as np
@@ -7,6 +8,37 @@ import os
 import re
 
 
+
+def get_theory_temperature(Z=1, Te0=1, ni=1.980347749E27, ne=1.980347749E27, log_A=0.1, SLas=3.5e17, tstop=1e-9): 
+    
+    ne_kappa = ne/1e6
+    kb_cgs = 1.6e-12 #ergs/eV
+    nr = find_critical_dens_ratio(0.527, ne)
+
+    kappa = (1e-16) * Z * (nr*ne/100**3) * log_A  ## in cm^-1 # From the PAPER BY DENAVIT 1994
+
+    tstart = 0
+    ndt = 1000
+    dt = (tstop-tstart)/ndt
+    time_array = np.linspace(tstart, tstop, ndt)
+    tcode_array = np.zeros_like(time_array)
+    Phi0_a = np.zeros_like(time_array)
+    Phi0_t = np.zeros_like(Phi0_a)
+    for i, t in enumerate(time_array):
+        maxS = SLas
+        tcode_array[i] = t
+        Phi0_a[i] = maxS*(1e7/1e4)
+
+    tcode_array = tcode_array-tcode_array[0]
+    Phi0_t[1:] = integrate.cumtrapz(Phi0_a, x=tcode_array)
+
+    Te0 = ((5/3)*(Phi0_t*kappa/ne_kappa/kb_cgs)+Te0**(5/2))**(2/5)
+
+    # fig, ax = plt.subplots(nrows=1, ncols=1, sharex=True)
+    # fig.set_size_inches(13.385, 6.0)
+    # ax.plot(tcode_array, Te0, 'g-', linewidth=4, label='Fitted')
+    # plt.show()
+    return tcode_array, Te0
 
 def find_critical_dens_ratio(wl, dens):
     # wl in micron #
