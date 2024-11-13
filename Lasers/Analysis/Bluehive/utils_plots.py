@@ -370,7 +370,7 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     phase_plot.set_ylabel('Proper Velocity $\gamma v_1$ [ c ]', labelpad=20)
 
     # Mark the line-out location on the 2D plot
-    phase_plot.axvline(x=line_out_x, color='red', linestyle='--')
+    phase_plot.axvline(x=line_out_x, color='red', linewidth=4, linestyle='--')
     # cbar = fig.colorbar(phase_contour, ax=phase_plot)
 
     # Create the side 1D plot
@@ -391,8 +391,8 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
         # Now also plot the 1 eV Maxwellian
         maxwellian = ut.gaussian(yaxis, pfit[0], pfit[1], np.sqrt(elc/(m_e*1*clight**2)))
         ax2.plot(maxwellian, yaxis, color='black', linestyle='--', linewidth=4)
-        ax2.plot(line_out_values, yaxis, color='blue', linewidth=3)
-        ax2.plot(y_fit, yaxis, color='red', linewidth=2)
+        ax2.plot(line_out_values, yaxis, color='blue', linewidth=4)
+        ax2.plot(y_fit, yaxis, color='red', linewidth=4)
         ax2.set_title("1D Line-out at x={}".format(line_out_x))
         ax2.set_ylim(ext_stuff[2], ext_stuff[3])
         ax2.set_xlabel("Value")
