@@ -48,6 +48,13 @@ def save_temperature_time_series(dataset='e3',times=[0,1],species='electrons', s
 def fields(rundir='',dataset=['e3', 'j3'],mu=1, zeff=1, time=0,space=-1,
     xlim=[-1,-1],ylim=[-1,-1],zlim=[-1,-1], tmult=1, xmult=1, ymult=1,intensitymult=[1],
     plotdata=[], colors=['r'], to_plot=True, to_normalize=False, to_save=True, save_dir='./', use_ions=False, **kwargs):
+    de_0 = read_density(rundir=rundir,dataset='m',species='electrons',time=0, line_out_x=0, tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, color=None, to_plot=False, to_save=False, save_dir=save_dir)
+
+    if use_ions:
+        delectron = read_density(rundir=rundir,dataset='m',species='ions',time=time, line_out_x=0, tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, color=None, to_plot=False, to_save=False, save_dir=save_dir)
+    else:
+        delectron = read_density(rundir=rundir,dataset='m',species='electrons',time=time, line_out_x=0, tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, color=None, to_plot=False, to_save=False, save_dir=save_dir)
+    
     data_tosave = {}
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -109,14 +116,17 @@ def fields(rundir='',dataset=['e3', 'j3'],mu=1, zeff=1, time=0,space=-1,
                 ion_correction = zeff/(mu*1836)
             fheredens = h5py.File(fdens, "r")
             y = fheredens["x1_m"][:]
-            ylimabs = 0.5*ion_correction
+            ylimabs = 0.50*ion_correction
             # ylimabs = 1.9803477e+21
             # ylimabs = 1
-            ax2.plot(np.arange(0,xaxismax,dx),ylimabs*y, 'k-', linewidth=4, label=data)
+            yplot = ylimabs*y
+            ax2.plot(np.arange(0,xaxismax,dx),yplot, 'k-', linewidth=4, label=data)
             ax2.set_ylim(-0.01, 0.6)
             ax2.set_ylabel("N/N_0")
             data_tosave["x1_m"] = ylimabs*y
-
+            data_tosave["x1_m_density"] = ylimabs*delectron
+            data_tosave["x1_m_density_t0"] = ylimabs*de_0
+           
 
         except:
             print("No density data!")
@@ -308,8 +318,8 @@ def phasespace(rundir='',dataset='p1x1',species='electrons',time=0,
         plt.show()
 
 
-def read_density(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
-    
+def read_density(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=False, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
+    data_tosave = {}
     save_string = "vars_"+dataset+"_"+species
 
     workdir = os.getcwd()
@@ -321,7 +331,6 @@ def read_density(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x
     i = 0
     for j in range(len(files)):
         fhere = h5py.File(os.path.join(odir,files[j]), 'r')
-        print(fhere.attrs['TIME'][0])
         if(fhere.attrs['TIME'][0] >= time):
             i = j
             break
@@ -329,9 +338,20 @@ def read_density(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x
 
     dens=ut.read_h5(os.path.join(odir,files[i]))
 
-    den_plot = plt.subplot(223)
-    osh5vis.osplot(dens,title=species+' Density')
-    plt.show()
+    dens_array = dens.view(np.ndarray)
+    if to_plot:
+        den_plot = plt.subplot(111)
+        osh5vis.osplot(0.5*dens,title=species+' Density')
+        plt.show()
+
+    data_tosave["x1_m"] = 0.5*dens_array
+    if to_save:
+        run_name = rundir.split("/")[-1]   
+        save_name = save_dir+"Data/"+run_name+"_"+save_string+"_time_"+str(i)
+        pickle.dump(data_tosave, open(save_name+".p", "wb"))  
+
+    return dens_array
+
 def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False):
     
     save_string = "vars_"+dataset+"_"+species
@@ -377,6 +397,12 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
     line_out_index = np.argmin(np.abs(xaxis - line_out_x))
     line_out_values = phase_space[:, line_out_index]
 
+    ax2.plot(line_out_values, yaxis, color='blue', linewidth=4)
+    ax2.set_title("1D Line-out at x={}".format(line_out_x))
+    ax2.set_ylim(ext_stuff[2], ext_stuff[3])
+    ax2.set_xlabel("Value")
+    ax2.yaxis.tick_right()
+    
     ## Fit to Gaussian ##
     if to_fit:
         pfit = ut.fit_to_gaussian(yaxis, line_out_values)
@@ -393,10 +419,10 @@ def make_contour2(rundir='',dataset='p1x1',species='electrons',time=0, line_out_
         ax2.plot(maxwellian, yaxis, color='black', linestyle='--', linewidth=4)
         ax2.plot(line_out_values, yaxis, color='blue', linewidth=4)
         ax2.plot(y_fit, yaxis, color='red', linewidth=4)
-        ax2.set_title("1D Line-out at x={}".format(line_out_x))
-        ax2.set_ylim(ext_stuff[2], ext_stuff[3])
-        ax2.set_xlabel("Value")
-        ax2.yaxis.tick_right()
+        # ax2.set_title("1D Line-out at x={}".format(line_out_x))
+        # ax2.set_ylim(ext_stuff[2], ext_stuff[3])
+        # ax2.set_xlabel("Value")
+        # ax2.yaxis.tick_right()
 
     plt.tight_layout()
 

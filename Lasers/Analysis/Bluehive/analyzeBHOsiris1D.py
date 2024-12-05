@@ -31,7 +31,8 @@ dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wcoll_n0'
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_128_S_x10_long_wocoll_n0'
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0'
 dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_2048_S_x10_long_wcoll_n0'
-dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vion'
+dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_H'
 
 # dirname = datadir+'Laser1D_n_ncrit_0p5_Ne_8192'
 S = 3.5e17 # W/m^2
@@ -93,8 +94,9 @@ b0 = e0/clight
 j0 = b0/l0_m/mu_0
 time = 1480
 time = 14790
-# time = 14780
-# time = 0
+
+time = 14780
+# time = 4000
 time_fs = time*t0*1e15
 times = utp.get_all_times(dirname)
 
@@ -107,8 +109,8 @@ times = utp.get_all_times(dirname)
 # utp.make_contour2(rundir=dirname,dataset='p1x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6.0, to_fit=False, xmult=clight/omega_p/wavelength, ymult=1, species='ions', to_plot=False, to_save=True, save_dir=save_dir)
 temp_0 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 5.75, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=True, save_dir=save_dir, to_return_temp=True, to_clear=False)
 temp_1 = utp.make_contour2(rundir=dirname,dataset='p3x1',time=time, xlim=[0,12], tmult=10**15*t0, line_out_x = 6.0, xmult=clight/omega_p/wavelength, ymult=1, species='electrons', to_plot=False, to_save=True, save_dir=save_dir, to_return_temp=True, to_clear=False)
-utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],mu=4, zeff=1, time=time, use_ions=True, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_plot=True, to_save=True, save_dir=save_dir)
-utp.read_density(rundir=dirname,dataset='m',species='electrons',time=0, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=False, save_dir='./', to_return_temp=False, to_clear=False)
+utp.fields(rundir=dirname,dataset=['e3', 'b2', 'j3'],mu=4, zeff=1, time=time, use_ions=False, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0, b0, j0], colors=['r-', 'g-', 'b-'], to_normalize=True, to_plot=True, to_save=True, save_dir=save_dir)
+utp.read_density(rundir=dirname,dataset='m',species='electrons',time=time, line_out_x=0, to_fit=True, xlim=[-1,-1], tmult=1, ylim=[-1,-1],zlim=[-1,-1], xmult=1, ymult=1, plotdata=[], color=None, to_plot=True, to_save=True, save_dir=save_dir, to_return_temp=False, to_clear=False)
 # utp.fields(rundir=dirname,dataset=['e3'],time=time, xlim=[0,12], tmult=10**15*t0, xmult=l0, ymult=l0, intensitymult=[e0], colors=['b-'], 
         # to_normalize=False, to_save=True, save_dir=save_dir)
 

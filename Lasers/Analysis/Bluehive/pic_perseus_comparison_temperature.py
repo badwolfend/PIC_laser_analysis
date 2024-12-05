@@ -19,8 +19,8 @@ else:
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_C14_temperature_times']
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_temperature_times']
 
-fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_temperature_times']
-fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_temperature_times']
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vion_temperature_times']
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_cond_visc_temperature_times']
 
 fpicstr =''
 
@@ -77,10 +77,10 @@ for fi, fpic in enumerate(fname_pic):
     # Set size of plot 
     fig0.set_size_inches(13.385, 6.69)
 
-    ax0.plot(np.array(time_pic), te0_pic, label='PIC 0', linewidth=4, alpha=0.75, color='xkcd:sky blue')
-    ax0.plot(time_perseus, te0_perseus, label='Perseus 0', linewidth=4, alpha=0.75, color='xkcd:blue')
+    # ax0.plot(np.array(time_pic), te0_pic, label='PIC 0', linewidth=4, alpha=0.75, color='xkcd:sky blue')
+    # ax0.plot(time_perseus, te0_perseus, label='Perseus 0', linewidth=4, alpha=0.75, color='xkcd:blue')
     ax0.plot(np.array(time_pic), te1_pic, label='PIC 1', linewidth=4, alpha=0.75, color='xkcd:rose')
-    ax0.plot(time_perseus, te1_perseus, label='Perseus 1', linewidth=4, alpha=0.75, color='xkcd:red')
+    ax0.plot(time_perseus, te1_perseus, label='Perseus 1', linewidth=4, alpha=0.75, color='xkcd:blue')
     ax0.plot(tcode_array, Te0, label='Perseus 1', linewidth=4, linestyle=(0, (3, 1, 1, 1, 1, 1)), color='xkcd:black')
 
     # ax0.plot(np.array(time_pic), te1_pic, label='PIC 0', linewidth=4, alpha=0.75, color='xkcd:black')

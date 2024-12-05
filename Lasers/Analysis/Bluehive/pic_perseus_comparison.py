@@ -13,6 +13,8 @@ time_perseus = 492
 time_pic = 1786
 time_pic = 536
 time_perseus = 495
+time_perseus = 17
+
 if osx:
     datadir = '/Volumes/T9/XSPL/Lasers/Outputs/Data/'
     savedir = '/Volumes/T9/XSPL/Lasers/Outputs/Plots/'
@@ -43,10 +45,16 @@ fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_lon
 fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vars_e3_b2_j3_time_'+str(time_pic)]
 fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_time_'+str(time_perseus)]
 
-# fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vars_e3_b2_j3_time_'+str(time_pic)]
-# fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p1_pulse_I_3p5e17_0p1Ln_t_long_He3_time_'+str(time_perseus)]
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_forpic_time_'+str(time_perseus)]
 
-pic_colors = {0:{'e3':'xkcd:light red', 'j3':'xkcd:sky blue', 'b2':'xkcd:green', 'ne':'k'}, 1:{'e3':'xkcd:light red', 'j3':'xkcd:cyan', 'b2':'xkcd:green','ne':'k'}}
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_vion_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_0p1Ln_t_long_He3_cond_visc_forpic_time_'+str(time_perseus)]
+
+fname_pic = ['Laser1D_n_ncrit_0p5_Ne_512_S_x10_long_wcoll_n0_He3_2f_Cl_1_vars_e3_b2_j3_time_'+str(time_pic)]
+fname_perseus = ['pic_comparison_nncrit_0p5_gamma_1p666_pulse_I_3p5e17_1p0Ln_t_long_He3_cond_visc_forpic_time_'+str(time_perseus)]
+
+pic_colors = {0:{'e3':'xkcd:light red', 'j3':'xkcd:sky blue', 'b2':'xkcd:green', 'ne':'xkcd:kelly green', 'ne0':'xkcd:black'}, 1:{'e3':'xkcd:light red', 'j3':'xkcd:cyan', 'b2':'xkcd:green','ne':'k'}}
 pic_alpha = [0.65, 0.90]
 perseus_colors = {0:{'e3':'xkcd:red', 'j3':'xkcd:bright blue', 'b2':'xkcd:blue green', 'ne':'xkcd:burnt umber'}, 1:{'e3':'xkcd:red', 'j3':'xkcd:bright blue', 'b2':'xkcd:blue green', 'ne':'xkcd:burnt umber'}}
 perseus_alpha = [1, 1]
@@ -135,6 +143,7 @@ for fi, fpic in enumerate(fname_pic):
     # ax.legend()
     ax12 = ax1.twinx()
     ax12.plot(x_pic, data_pic['x1_m'], color=pic_colors[fi]['ne'], label='PIC', linewidth=4, alpha=pic_alpha[fi])
+    ax12.plot(x_pic, data_pic['x1_m_density_t0'], color=pic_colors[fi]['ne0'], label='PIC T0', linewidth=4, alpha=1)
     ax12.plot(x_perseus, data_perseus['ne']/ut.find_critical_dens(0.527), color=perseus_colors[fi]['ne'], label='PIC', linewidth=4, linestyle='--', alpha=perseus_alpha[fi])
     ax12.set_ylim(-0.01, 0.6)
 
